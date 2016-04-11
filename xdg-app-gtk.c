@@ -18,6 +18,13 @@
 #include <gdk/gdkx.h>
 #endif
 
+enum
+{
+  PROP_0,
+
+  PROP_DISPLAY,
+};
+
 typedef struct _XdgAppGtkImplPrivate
 {
   GdkDisplay *display;
@@ -63,6 +70,56 @@ xdg_app_gtk_impl_get_display (XdgAppGtkImpl *impl)
 }
 
 static void
+xdg_app_gtk_impl_dispose (GObject *object)
+{
+  XdgAppGtkImpl *impl = XDG_APP_GTK_IMPL (object);
+  XdgAppGtkImplPrivate *priv = xdg_app_gtk_impl_get_instance_private (impl);
+
+  g_clear_object (&priv->display);
+
+  G_OBJECT_CLASS (xdg_app_gtk_impl_parent_class)->dispose (object);
+}
+
+static void
+xdg_app_gtk_impl_set_property (GObject      *object,
+                               guint         prop_id,
+                               const GValue *value,
+                               GParamSpec   *pspec)
+{
+  XdgAppGtkImpl *impl = XDG_APP_GTK_IMPL (object);
+  XdgAppGtkImplPrivate *priv = xdg_app_gtk_impl_get_instance_private (impl);
+
+  switch (prop_id)
+    {
+    case PROP_DISPLAY:
+      g_set_object (&priv->display, g_value_get_object (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+xdg_app_gtk_impl_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  XdgAppGtkImpl *impl = XDG_APP_GTK_IMPL (object);
+  XdgAppGtkImplPrivate *priv = xdg_app_gtk_impl_get_instance_private (impl);
+
+  switch (prop_id)
+    {
+    case PROP_DISPLAY:
+      g_value_set_object (value, priv->display);
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 xdg_app_gtk_impl_init (XdgAppGtkImpl *impl)
 {
 }
@@ -70,6 +127,21 @@ xdg_app_gtk_impl_init (XdgAppGtkImpl *impl)
 static void
 xdg_app_gtk_impl_class_init (XdgAppGtkImplClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = xdg_app_gtk_impl_dispose;
+  object_class->get_property = xdg_app_gtk_impl_get_property;
+  object_class->set_property = xdg_app_gtk_impl_set_property;
+
+  g_object_class_install_property (object_class,
+                                   PROP_DISPLAY,
+                                   g_param_spec_object ("display",
+                                                        "GdkDisplay",
+                                                        "The GdkDisplay instance",
+                                                        GDK_TYPE_DISPLAY,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
 }
 
 static DialogHandle *
@@ -342,7 +414,6 @@ main (int argc, char *argv[])
   guint owner_id;
   g_autoptr(GError) error = NULL;
   g_autoptr(XdgAppGtkImpl) impl = NULL;
-  XdgAppGtkImplPrivate *priv;
   GDBusConnection  *session_bus;
   GOptionContext *context;
   GdkDisplay *display;
@@ -370,14 +441,13 @@ main (int argc, char *argv[])
   display = gdk_display_get_default ();
 #ifdef GDK_WINDOWING_X11
   if (GDK_IS_X11_DISPLAY (display))
-    impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_X11, NULL);
+    impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_X11,
+                         "display", display,
+                         NULL);
 #endif
 
   if (!impl)
     g_error ("No supported windowing system detected.");
-
-  priv = xdg_app_gtk_impl_get_instance_private (impl);
-  priv->display = display;
 
   loop = g_main_loop_new (NULL, FALSE);
 
