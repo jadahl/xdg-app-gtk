@@ -27,6 +27,13 @@ service_DATA = org.freedesktop.portal_backend.desktop.gtk.service
 
 xdg_app_gtk_portal_SOURCES = \
 	xdg-app-gtk.c		\
+	xdg-app-gtk.h		\
+	xdg-app-gtk-imported.c	\
+	xdg-app-gtk-imported.h	\
+	xdg-app-gtk-imported-x11.c	\
+	xdg-app-gtk-imported-x11.h	\
+	xdg-app-gtk-x11.c	\
+	xdg-app-gtk-x11.h	\
 	$(dbus_built_sources)	\
 	$(NULL)
 
