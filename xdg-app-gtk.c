@@ -13,6 +13,10 @@
 
 #include "xdg-app-portal-dbus.h"
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include "xdg-app-gtk-wayland.h"
+#include <gdk/gdkwayland.h>
+#endif
 #ifdef GDK_WINDOWING_X11
 #include "xdg-app-gtk-x11.h"
 #include <gdk/gdkx.h>
@@ -442,6 +446,12 @@ main (int argc, char *argv[])
 #ifdef GDK_WINDOWING_X11
   if (GDK_IS_X11_DISPLAY (display))
     impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_X11,
+                         "display", display,
+                         NULL);
+#endif
+#ifdef GDK_WINDOWING_WAYLAND
+  if (GDK_IS_WAYLAND_DISPLAY (display))
+    impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_WAYLAND,
                          "display", display,
                          NULL);
 #endif

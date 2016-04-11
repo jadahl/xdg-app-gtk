@@ -25,16 +25,42 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = org.freedesktop.portal_backend.desktop.gtk.service.in
 service_DATA = org.freedesktop.portal_backend.desktop.gtk.service
 
+wayland_built_sources = \
+	xdg-foreign-unstable-v1-client-protocol.h \
+	xdg-foreign-unstable-v1-protocol.c
+BUILT_SOURCES += $(wayland_built_sources)
+
+.SECONDEXPANSION:
+
+define protostability
+$(shell echo $1 | sed 's/.*\(\<unstable\>\|\<stable\>\).*/\1/')
+endef
+
+define protoname
+$(shell echo $1 | sed 's/\([a-z\-]\+\)-[a-z]\+-v[0-9]\+/\1/')
+endef
+
+%-protocol.c : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
+	$(AM_V_GEN)$(WAYLAND_SCANNER) code < $< > $@
+	$(AM_V_GEN)$(SED) -i -e 's/WL_EXPORT //' $@
+%-client-protocol.h : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header < $< > $@
+
 xdg_app_gtk_portal_SOURCES = \
 	xdg-app-gtk.c		\
 	xdg-app-gtk.h		\
 	xdg-app-gtk-imported.c	\
 	xdg-app-gtk-imported.h	\
+	xdg-app-gtk-imported-wayland.c	\
+	xdg-app-gtk-imported-wayland.h	\
 	xdg-app-gtk-imported-x11.c	\
 	xdg-app-gtk-imported-x11.h	\
+	xdg-app-gtk-wayland.c	\
+	xdg-app-gtk-wayland.h	\
 	xdg-app-gtk-x11.c	\
 	xdg-app-gtk-x11.h	\
 	$(dbus_built_sources)	\
+	$(wayland_built_sources)	\
 	$(NULL)
 
 xdg_app_gtk_portal_LDADD = $(BASE_LIBS) $(GTK_LIBS)

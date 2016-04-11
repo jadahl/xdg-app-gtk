@@ -18,3 +18,5 @@ compile
 *.service
 xdg-app-gtk-portal
 xdg-app-portal-dbus.[ch]
+xdg-foreign-*client-protocol.h
+xdg-foreign-*protocol.c

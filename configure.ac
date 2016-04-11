@@ -37,6 +37,11 @@ AC_SUBST(DBUS_SERVICE_DIR)
 AC_SUBST([XDG_APP_INTERFACES_DIR], [`$PKG_CONFIG --variable=interfaces_dir xdg-app`])
 AC_SUBST([GDBUS_CODEGEN], [`$PKG_CONFIG --variable gdbus_codegen gio-2.0`])
 
+PKG_CHECK_MODULES(WAYLAND, [wayland-client wayland-scanner wayland-protocols])
+AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, `$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
+AC_PATH_PROG([WAYLAND_SCANNER],[wayland-scanner],[no])
+AC_SUBST([WAYLAND_SCANNER])
+
 PKG_CHECK_MODULES(GTK, [gtk+-3.0])
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
