@@ -236,10 +236,6 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
                                         NULL);
   g_object_unref (fake_parent);
 
-
-  if (!imported)
-    g_warning ("Unhandled parent window type %s\n", arg_parent_window);
-
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog),
                                                   TRUE);
 
