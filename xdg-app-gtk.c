@@ -212,13 +212,9 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
       imported = xdg_app_gtk_importer_import (importer, arg_parent_window);
 
       if (imported)
-        {
-          display = xdg_app_gtk_imported_get_display (imported);
-        }
+        display = xdg_app_gtk_imported_get_display (imported);
       else
-        {
-          g_warning ("Failed to import parent window handle");
-        }
+        g_warning ("Failed to import parent window handle");
     }
 
   if (!display)
