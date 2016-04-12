@@ -83,6 +83,17 @@ xdg_app_gtk_imported_wayland_set_parent_of (XdgAppGtkImported *imported,
 }
 
 static void
+xdg_app_gtk_imported_wayland_finalize (GObject *object)
+{
+  XdgAppGtkImportedWayland *imported_wayland =
+    XDG_APP_GTK_IMPORTED_WAYLAND (object);
+
+  zxdg_imported_v1_destroy (imported_wayland->imported);
+
+  G_OBJECT_CLASS (xdg_app_gtk_imported_wayland_parent_class)->finalize (object);
+}
+
+static void
 xdg_app_gtk_imported_wayland_init (XdgAppGtkImportedWayland *imported_wayland)
 {
 }
@@ -90,7 +101,10 @@ xdg_app_gtk_imported_wayland_init (XdgAppGtkImportedWayland *imported_wayland)
 static void
 xdg_app_gtk_imported_wayland_class_init (XdgAppGtkImportedWaylandClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   XdgAppGtkImportedClass *imported_class = XDG_APP_GTK_IMPORTED_CLASS (klass);
+
+  object_class->finalize = xdg_app_gtk_imported_wayland_finalize;
 
   imported_class->set_parent_of = xdg_app_gtk_imported_wayland_set_parent_of;
 }
