@@ -31,6 +31,8 @@ typedef struct {
 
   GtkWidget *dialog;
   GDBusInterfaceSkeleton *skeleton;
+
+  XdgAppGtkImported *imported;
 } DialogHandle;
 
 static GHashTable *outstanding_handles;
@@ -39,7 +41,8 @@ static DialogHandle *
 dialog_handle_new (const char *app_id,
                    const char *sender,
                    GtkWidget *dialog,
-                   GDBusInterfaceSkeleton *skeleton)
+                   GDBusInterfaceSkeleton *skeleton,
+                   XdgAppGtkImported *imported)
 {
   DialogHandle *handle = g_new0 (DialogHandle, 1);
   guint32 r;
@@ -59,6 +62,8 @@ dialog_handle_new (const char *app_id,
   handle->sender = g_strdup (sender);
   handle->dialog = g_object_ref (dialog);
   handle->skeleton = g_object_ref (skeleton);
+  if (imported)
+    handle->imported = g_object_ref (imported);
 
   g_hash_table_insert (outstanding_handles, handle->id, handle);
 
@@ -76,6 +81,8 @@ dialog_handle_free (DialogHandle *handle)
   g_free (handle->sender);
   g_object_unref (handle->dialog);
   g_object_unref (handle->skeleton);
+  if (handle->imported)
+    g_object_unref (handle->imported);
   g_free (handle);
 }
 
@@ -237,7 +244,11 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog),
                                                   TRUE);
 
-  handle = dialog_handle_new (arg_app_id, arg_sender, dialog, G_DBUS_INTERFACE_SKELETON (chooser));
+  handle = dialog_handle_new (arg_app_id,
+                              arg_sender,
+                              dialog,
+                              G_DBUS_INTERFACE_SKELETON (chooser),
+                              imported);
 
   handle->dialog = dialog;
 
