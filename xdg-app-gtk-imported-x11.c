@@ -24,7 +24,9 @@ xdg_app_gtk_imported_x11_new (XdgAppGtkImpl *impl,
   GdkDisplay *display;
   XdgAppGtkImportedX11 *imported_x11;
 
-  imported_x11 = g_object_new (XDG_APP_GTK_TYPE_IMPORTED_X11, NULL);
+  imported_x11 = g_object_new (XDG_APP_GTK_TYPE_IMPORTED_X11,
+                               "impl", impl,
+                               NULL);
 
   display = xdg_app_gtk_impl_get_display (impl);
   imported_x11->imported_window =

@@ -17,6 +17,8 @@ struct _XdgAppGtkImportedClass
                          GtkWindow *window);
 };
 
+GdkDisplay * xdg_app_gtk_imported_get_display (XdgAppGtkImported *imported);
+
 void xdg_app_gtk_imported_set_parent_of (XdgAppGtkImported *imported,
                                          GtkWindow *window);
 

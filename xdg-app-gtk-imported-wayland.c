@@ -34,7 +34,9 @@ xdg_app_gtk_imported_wayland_new (XdgAppGtkImpl *impl,
 {
   XdgAppGtkImportedWayland *imported_wayland;
 
-  imported_wayland = g_object_new (XDG_APP_GTK_TYPE_IMPORTED_WAYLAND, NULL);
+  imported_wayland = g_object_new (XDG_APP_GTK_TYPE_IMPORTED_WAYLAND,
+                                   "impl", impl,
+                                   NULL);
   imported_wayland->imported = imported;
   zxdg_imported_v1_add_listener (imported, &xdg_imported_listener, imported);
 
