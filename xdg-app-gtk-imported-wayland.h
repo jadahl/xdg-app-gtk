@@ -5,6 +5,8 @@
 
 #include "xdg-app-gtk-imported.h"
 
+#include "xdg-app-gtk-impl.h"
+
 #include "xdg-foreign-unstable-v1-client-protocol.h"
 
 #define XDG_APP_GTK_TYPE_IMPORTED_WAYLAND (xdg_app_gtk_imported_wayland_get_type ())

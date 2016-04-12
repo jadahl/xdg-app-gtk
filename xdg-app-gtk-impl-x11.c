@@ -1,6 +1,6 @@
 #include "config.h"
 
-#include "xdg-app-gtk-x11.h"
+#include "xdg-app-gtk-impl-x11.h"
 
 #include <glib-object.h>
 #include <stdio.h>

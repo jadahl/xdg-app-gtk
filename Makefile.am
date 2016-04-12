@@ -55,10 +55,12 @@ xdg_app_gtk_portal_SOURCES = \
 	xdg-app-gtk-imported-wayland.h	\
 	xdg-app-gtk-imported-x11.c	\
 	xdg-app-gtk-imported-x11.h	\
-	xdg-app-gtk-wayland.c	\
-	xdg-app-gtk-wayland.h	\
-	xdg-app-gtk-x11.c	\
-	xdg-app-gtk-x11.h	\
+	xdg-app-gtk-impl.c	\
+	xdg-app-gtk-impl.h	\
+	xdg-app-gtk-impl-wayland.c	\
+	xdg-app-gtk-impl-wayland.h	\
+	xdg-app-gtk-impl-x11.c	\
+	xdg-app-gtk-impl-x11.h	\
 	$(dbus_built_sources)	\
 	$(wayland_built_sources)	\
 	$(NULL)

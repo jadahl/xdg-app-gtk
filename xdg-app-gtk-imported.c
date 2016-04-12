@@ -4,7 +4,7 @@
 
 #include <glib-object.h>
 
-#include "xdg-app-gtk.h"
+#include "xdg-app-gtk-impl.h"
 
 enum
 {

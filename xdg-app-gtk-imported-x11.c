@@ -4,7 +4,7 @@
 
 #include <gdk/gdkx.h>
 
-#include "xdg-app-gtk.h"
+#include "xdg-app-gtk-impl.h"
 #include "xdg-app-gtk-imported.h"
 
 struct _XdgAppGtkImportedX11

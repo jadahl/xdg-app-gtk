@@ -5,6 +5,8 @@
 
 #include "xdg-app-gtk-imported.h"
 
+#include "xdg-app-gtk-impl.h"
+
 #define XDG_APP_GTK_TYPE_IMPORTED_X11 (xdg_app_gtk_imported_x11_get_type ())
 G_DECLARE_FINAL_TYPE (XdgAppGtkImportedX11, xdg_app_gtk_imported_x11,
                       XDG_APP_GTK, IMPORTED_X11,

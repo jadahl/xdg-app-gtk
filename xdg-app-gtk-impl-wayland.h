@@ -1,7 +1,7 @@
-#ifndef XDG_APP_GTK_WAYLAND_H
-#define XDG_APP_GTK_WAYLAND_H
+#ifndef XDG_APP_GTK_IMPL_WAYLAND_H
+#define XDG_APP_GTK_IMPL_WAYLAND_H
 
-#include "xdg-app-gtk.h"
+#include "xdg-app-gtk-impl.h"
 
 #include <glib-object.h>
 
@@ -10,4 +10,4 @@ G_DECLARE_FINAL_TYPE (XdgAppGtkImplWayland, xdg_app_gtk_impl_wayland,
                       XDG_APP_GTK, IMPL_WAYLAND,
                       XdgAppGtkImpl);
 
-#endif /* XDG_APP_GTK_WAYLAND_H */
+#endif /* XDG_APP_GTK_IMPL_WAYLAND_H */

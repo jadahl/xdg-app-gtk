@@ -1,6 +1,6 @@
 #include "config.h"
 
-#include "xdg-app-gtk-wayland.h"
+#include "xdg-app-gtk-impl-wayland.h"
 
 #include <glib-object.h>
 #include <gdk/gdkwayland.h>
