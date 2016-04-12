@@ -197,7 +197,7 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
                                GVariant *arg_options)
 {
   GtkWidget *dialog;
-  GdkDisplay *display;
+  GdkDisplay *display = NULL;
   GdkScreen *screen;
   GtkWidget *fake_parent;
   DialogHandle *handle;
