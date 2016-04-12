@@ -218,7 +218,10 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
     }
 
   if (!display)
-    gdk_display_get_default ();
+    {
+      gdk_set_allowed_backends (NULL);
+      gdk_display_get_default ();
+    }
 
   screen = gdk_display_get_default_screen (display);
 
