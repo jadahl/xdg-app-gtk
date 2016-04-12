@@ -7,21 +7,13 @@
 
 #include <gio/gio.h>
 
-#include "xdg-app-gtk-impl.h"
 #include "xdg-app-gtk-imported.h"
+#include "xdg-app-gtk-importer.h"
 
 #include "xdg-app-portal-dbus.h"
 
-#ifdef GDK_WINDOWING_WAYLAND
-#include "xdg-app-gtk-impl-wayland.h"
-#include <gdk/gdkwayland.h>
-#endif
-#ifdef GDK_WINDOWING_X11
-#include "xdg-app-gtk-impl-x11.h"
-#include <gdk/gdkx.h>
-#endif
-
 static GMainLoop *loop;
+static XdgAppGtkImporter *importer;
 
 static gboolean opt_verbose;
 static gboolean opt_replace;
@@ -195,19 +187,42 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
                                const gchar *arg_app_id,
                                const gchar *arg_parent_window,
                                const gchar *arg_title,
-                               GVariant *arg_options,
-                               XdgAppGtkImpl *impl)
+                               GVariant *arg_options)
 {
   GtkWidget *dialog;
+  GdkDisplay *display;
+  GdkScreen *screen;
   GtkWidget *fake_parent;
   DialogHandle *handle;
   XdgAppDesktopFileChooserBackend *chooser = XDG_APP_DESKTOP_FILE_CHOOSER_BACKEND (g_dbus_method_invocation_get_user_data (invocation));
-  XdgAppGtkImported *imported;
+  XdgAppGtkImported *imported = NULL;
 
   g_print ("open file, app_id: %s, object: %p, user_data: %p\n", arg_app_id, object,
            g_dbus_method_invocation_get_user_data (invocation));
 
-  fake_parent = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  if (arg_parent_window)
+    {
+      imported = xdg_app_gtk_importer_import (importer, arg_parent_window);
+
+      if (imported)
+        {
+          display = xdg_app_gtk_imported_get_display (imported);
+        }
+      else
+        {
+          g_warning ("Failed to import parent window handle");
+        }
+    }
+
+  if (!display)
+    gdk_display_get_default ();
+
+  screen = gdk_display_get_default_screen (display);
+
+  fake_parent = g_object_new (GTK_TYPE_WINDOW,
+                              "type", GTK_WINDOW_TOPLEVEL,
+                              "screen", screen,
+                              NULL);
   g_object_ref_sink (fake_parent);
   dialog = gtk_file_chooser_dialog_new (arg_title, GTK_WINDOW (fake_parent), GTK_FILE_CHOOSER_ACTION_OPEN,
                                         "_Cancel", GTK_RESPONSE_CANCEL,
@@ -215,7 +230,6 @@ handle_file_chooser_open_file (XdgAppDesktopFileChooserBackend *object,
                                         NULL);
   g_object_unref (fake_parent);
 
-  imported = xdg_app_gtk_impl_import (impl, arg_parent_window);
 
   if (!imported)
     g_warning ("Unhandled parent window type %s\n", arg_parent_window);
@@ -270,7 +284,6 @@ on_bus_acquired (GDBusConnection *connection,
                  const gchar     *name,
                  gpointer         user_data)
 {
-  XdgAppGtkImpl *impl = user_data;
   XdgAppDesktopFileChooserBackend *helper;
   GError *error = NULL;
 
@@ -278,7 +291,7 @@ on_bus_acquired (GDBusConnection *connection,
 
   g_signal_connect (helper, "handle-open-file",
                     G_CALLBACK (handle_file_chooser_open_file),
-                    impl);
+                    NULL);
   g_signal_connect (helper, "handle-close", G_CALLBACK (handle_file_chooser_close), NULL);
 
   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (helper),
@@ -312,10 +325,8 @@ main (int argc, char *argv[])
 {
   guint owner_id;
   g_autoptr(GError) error = NULL;
-  g_autoptr(XdgAppGtkImpl) impl = NULL;
   GDBusConnection  *session_bus;
   GOptionContext *context;
-  GdkDisplay *display;
 
   setlocale (LC_ALL, "");
 
@@ -337,24 +348,8 @@ main (int argc, char *argv[])
 
   g_set_prgname (argv[0]);
 
-  display = gdk_display_get_default ();
-#ifdef GDK_WINDOWING_X11
-  if (GDK_IS_X11_DISPLAY (display))
-    impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_X11,
-                         "display", display,
-                         NULL);
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (GDK_IS_WAYLAND_DISPLAY (display))
-    impl = g_object_new (XDG_APP_GTK_TYPE_IMPL_WAYLAND,
-                         "display", display,
-                         NULL);
-#endif
-
-  if (!impl)
-    g_error ("No supported windowing system detected.");
-
   loop = g_main_loop_new (NULL, FALSE);
+  importer = g_object_new (XDG_APP_GTK_TYPE_IMPORTER, NULL);
 
   session_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (session_bus == NULL)
@@ -369,7 +364,7 @@ main (int argc, char *argv[])
                              on_bus_acquired,
                              on_name_acquired,
                              on_name_lost,
-                             impl,
+                             NULL,
                              NULL);
 
   g_main_loop_run (loop);

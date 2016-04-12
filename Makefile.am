@@ -55,6 +55,8 @@ xdg_app_gtk_portal_SOURCES = \
 	xdg-app-gtk-imported-wayland.h	\
 	xdg-app-gtk-imported-x11.c	\
 	xdg-app-gtk-imported-x11.h	\
+	xdg-app-gtk-importer.c	\
+	xdg-app-gtk-importer.h	\
 	xdg-app-gtk-impl.c	\
 	xdg-app-gtk-impl.h	\
 	xdg-app-gtk-impl-wayland.c	\
